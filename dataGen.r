@@ -46,19 +46,20 @@ for(num in c(1:6)) {
 grams.list <- list(readRDS(file="data1.sav"),readRDS(file="data2.sav"),readRDS(file="data3.sav"), readRDS(file="data4.sav"), readRDS(file="data5.sav"), readRDS(file="data6.sav"))
 
 search <- function(x) {
-  words <- strsplit(x," ")
+  words <- unlist(strsplit(x," "))
   len <- length(words)
-  if(len > 6) {
-    words <- words[len-6:len]
+  if(len > 5) {
+    words <- words[len-5:len]
   }
   else if(len == 0) {
     return(sample(grams.list[1],5,replace = TRUE))
   }
   for( n in c(len:2)) {
-    word <- paste(unlist(words[len-n+1:len]),collapse =' ')
+    word <- paste(words[len-n+1:len],collapse =' ')
+    print(n)
     print(word)
-    ans <- as.data.frame(grams.list[n]) %>% filter(word1==word)
-    if(nrows(ans) > 0) { 
+    ans <- as.data.frame(grams.list[n+1]) %>% filter(word1==word)
+    if(nrow(ans) > 0) { 
       return(ans)
     }
   }
