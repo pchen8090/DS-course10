@@ -46,6 +46,7 @@ for(num in c(1:6)) {
 grams.list <- list(readRDS(file="data1.sav"),readRDS(file="data2.sav"),readRDS(file="data3.sav"), readRDS(file="data4.sav"), readRDS(file="data5.sav"), readRDS(file="data6.sav"))
 
 search <- function(x) {
+  x <- tolower(x)
   words <- unlist(strsplit(x," "))
   len <- length(words)
   if(len > 5) {
