@@ -8,9 +8,14 @@
 #
 
 library(shiny)
+library(tidytext)
+library(dplyr)
+library(tidyr)
+library(DT)
+
 
 # Define server logic required to draw a histogram
-shinyServer(function(input, output) {
+shinyServer(function(input, output,session) {
     grams.list <- list(readRDS(file="./data/data1.sav"),
                        readRDS(file="./data/data2.sav"),
                        readRDS(file="./data/data3.sav"), 
@@ -23,13 +28,13 @@ shinyServer(function(input, output) {
         words <- unlist(strsplit(x," "))
         len <- length(words)
         if(len > 5) {
-            words <- words[len-5:len]
+            words <- tail(words, 5)
         }
         else if(len == 0) {
             return(sample_n(top.list,5,replace = FALSE))
         }
-        for( n in c(len:2)) {
-            word <- paste(words[len-n+1:len],collapse =' ')
+        for( n in c(len:1)) {
+            word <- paste(unlist(tail(words,n)),collapse =' ')
             print(n)
             print(word)
             ans <- as.data.frame(grams.list[n+1]) %>% filter(word1==word)
@@ -55,7 +60,16 @@ shinyServer(function(input, output) {
     })
     output$table <-  renderDataTable({
         ans<-search(input$input)
-        ans %>% select(word2,frequency) %>% top_n(2)
+        ans %>% select(word2,frequency) %>% top_n(5)
     },options = list(paging = FALSE, searching = FALSE))
     
+    observeEvent(input$table_cell_clicked,{
+        info = input$table_cell_clicked
+        word <- input$input
+        # do nothing if not clicked yet, or the clicked cell is not in the 1st column
+        if (!is.null(info$value)){
+             updateTextInput(session, "input", value = paste(word, info$value))
+        }
+            
+    })
 })

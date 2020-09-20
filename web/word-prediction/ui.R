@@ -13,7 +13,7 @@ library(shiny)
 shinyUI(fluidPage(
 
     # Application title
-    titlePanel("Old Faithful Geyser Data"),
+    titlePanel("N-gram word prediction"),
 
     # Sidebar with a slider input for number of bins
 
@@ -23,7 +23,7 @@ shinyUI(fluidPage(
         textInput("input", "Input", value = ""),
         textOutput("pridict_var"),
         h2("Prediction:"),
-        dataTableOutput("table")
+        DT::dataTableOutput("table")
         
         
         

@@ -10,9 +10,9 @@ fh_news <- file("./data/en_US/en_US.news.txt")
 nw <- readLines(fh_news,  encoding="UTF-8")
 
 set.seed(100)
-blogs <- sample(bg,length(bg)/100,replace=TRUE)
-twitter <- sample(tw,length(tw)/100,replace=TRUE)
-news <- sample(nw,length(nw)/100,replace=TRUE)
+blogs <- sample(bg,length(bg)/10,replace=TRUE)
+twitter <- sample(tw,length(tw)/10,replace=TRUE)
+news <- sample(nw,length(nw)/10,replace=TRUE)
 tp <- function(x){
   gsub("http[[:alnum:]]*",'', x)
   gsub('http\\S+\\s*', '', x) ## Remove URLs
@@ -40,7 +40,9 @@ for(num in c(1:6)) {
   }
   else {
     ngrams <- ngrams %>% rename(word2 = ngram)
-  }
+  }  
+  len <- nrow(ngrams) 
+  ngrams <- ngrams %>% top_n(len/2) %>% filter(count > 1)
   saveRDS(ngrams,file=paste("data",num,".sav",sep=""))
 }
 grams.list <- list(readRDS(file="data1.sav"),readRDS(file="data2.sav"),readRDS(file="data3.sav"), readRDS(file="data4.sav"), readRDS(file="data5.sav"), readRDS(file="data6.sav"))
