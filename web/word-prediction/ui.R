@@ -23,10 +23,12 @@ shinyUI(fluidPage(
         textInput("input", "Input", value = ""),
         textOutput("pridict_var"),
         h2("Prediction:"),
-        DT::dataTableOutput("table")
         
-        
-        
+        fluidRow(
+            column(6, DT::dataTableOutput("table")),
+            column(6, plotOutput("plot"))
+        ),
+        h2("Please click the row in prediction table to continue:")
     )
     
 ))

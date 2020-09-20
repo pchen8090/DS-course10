@@ -12,6 +12,7 @@ library(tidytext)
 library(dplyr)
 library(tidyr)
 library(DT)
+library(ggplot2)
 
 
 # Define server logic required to draw a histogram
@@ -24,7 +25,6 @@ shinyServer(function(input, output,session) {
                        readRDS(file="./data/data6.sav"))
     top.list <- as.data.frame(grams.list[1])[1:100,]
     search <- function(x) {
-        x <- tolower(x)
         words <- unlist(strsplit(x," "))
         len <- length(words)
         if(len > 5) {
@@ -33,13 +33,14 @@ shinyServer(function(input, output,session) {
         else if(len == 0) {
             return(sample_n(top.list,5,replace = FALSE))
         }
+        x <- tolower(x)
         for( n in c(len:1)) {
             word <- paste(unlist(tail(words,n)),collapse =' ')
             print(n)
             print(word)
             ans <- as.data.frame(grams.list[n+1]) %>% filter(word1==word)
             if(nrow(ans) > 0) { 
-                return(ans)
+                return(ans %>% top_n(5))
             }
         }
         return(sample_n(top.list,5,replace = FALSE))
@@ -55,14 +56,26 @@ shinyServer(function(input, output,session) {
             })
         })
     })
+    
+
+    
+
+
     output$pridict_var <- renderText({
         input$input
     })
-    output$table <-  renderDataTable({
-        ans<-search(input$input)
-        ans %>% select(word2,frequency) %>% top_n(5)
-    },options = list(paging = FALSE, searching = FALSE))
     
+    observeEvent(input$input,{
+        ans <- search(input$input)
+        print(ans)
+        output$table <-  renderDataTable({
+            ans %>% select(word2,frequency)
+        },options = list(paging = FALSE, searching = FALSE))
+        output$plot <- renderPlot({
+            ndraw<- ans %>% mutate( p = frequency / sum(frequency))
+            ggplot(data=ndraw, aes(x =  reorder(word2, -p), y = p)) + geom_bar(stat = "identity", fill="steelblue")
+        })
+    })
     observeEvent(input$table_cell_clicked,{
         info = input$table_cell_clicked
         word <- input$input
